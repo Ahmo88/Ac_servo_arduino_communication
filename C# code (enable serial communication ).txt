@@ -1,0 +1,118 @@
+using System;
+using System.Windows.Forms;
+using CommandMessenger;
+using CommandMessenger.TransportLayer;
+
+
+namespace Servo
+{
+    public partial class Inicijalizacija : Form
+    {
+
+
+
+        System.Windows.Forms.Timer timer = new Timer();
+        public static SerialTransport _serialTransport;
+        public static CmdMessenger _cmdMessenger;
+        public Inicijalizacija()
+        {
+            InitializeComponent();
+
+
+
+        }
+
+        private int init()
+        {
+            try
+            {
+
+
+                int x = int.Parse(comboBox2.SelectedItem.ToString());
+
+
+
+                // Create Serial Port object
+                _serialTransport = new SerialTransport();
+                _serialTransport.CurrentSerialSettings.PortName = comboBox1.SelectedItem.ToString();    // Set com port
+                _serialTransport.CurrentSerialSettings.BaudRate = x;     // Set baud rate
+                _serialTransport.CurrentSerialSettings.DtrEnable = false;     // For some boards (e.g. Sparkfun Pro Micro) DtrEnable may need to be true.
+
+                // Initialize the command messenger with the Serial Port transport layer
+                _cmdMessenger = new CmdMessenger(_serialTransport);
+
+                // Tell CmdMessenger if it is communicating with a 16 or 32 bit Arduino board
+                _cmdMessenger.BoardType = BoardType.Bit16;
+
+
+
+                return 1;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Greska pokusajte ponovo");
+                return 0;
+            }
+
+
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+
+
+            if (init() == 1)
+            {
+                this.Hide();
+                lvKulma ss = new lvKulma();
+                ss.Show();
+            }
+            else
+            {
+                this.Show();
+
+
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
+
+        private void Inicijalizacija_FormClosing(object sender, FormClosingEventArgs e)
+        {
+
+            Application.Exit();
+        }
+
+       
+        private void Inicijalizacija_Load(object sender, EventArgs e)
+        {
+           FormBorderStyle = FormBorderStyle.None;
+           timer.Interval = 4000;
+           timer.Tick += new EventHandler(timer_Tick);
+           timer.Start();
+        
+        }
+
+
+        void timer_Tick (object sender,EventArgs e)
+        {
+
+            if (init() == 1)
+            {
+                this.Hide();
+                lvKulma ss = new lvKulma();
+                ss.Show();
+                timer.Stop();
+            }
+           
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
